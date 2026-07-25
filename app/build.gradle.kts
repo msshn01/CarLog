@@ -6,7 +6,7 @@ plugins {
 android {
     namespace = "com.example.carlog"
     compileSdk {
-        version = release(36) {
+        version = release(37) {
             minorApiLevel = 1
         }
     }
@@ -36,7 +36,7 @@ android {
         compose = true
     }
 }
-
+val nav_version = "2.9.8"
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -53,4 +53,26 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+
+    // GSON Converter (Retrofit'in JSON'ı nesneye çevirmesi ve @SerializedName için)
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    implementation("com.google.code.gson:gson:2.14.0")
+    implementation("androidx.compose.material:material-icons-extended")
+    // Jetpack Compose integration
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    // Views/Fragments integration
+    implementation("androidx.navigation:navigation-fragment:$nav_version")
+    implementation("androidx.navigation:navigation-ui:$nav_version")
+
+    // Feature module support for Fragments
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
+
+    // Testing Navigation
+    androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
+
+    // JSON serialization library, works with the Kotlin serialization plugin
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 }

@@ -4,44 +4,196 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.carlog.ui.theme.CarLogTheme
+import com.example.carlog.ui.theme.barBackground
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CarLogTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+            NavBar()
+
+        }
+    }
+
+
+    @Composable
+    fun NavBar(){
+        val navController = rememberNavController()
+        NavHost(navController = navController, startDestination = "openScreen"){
+            composable("home"){
+
+            }
+            composable("profil"){
+
+            }
+            composable("openScreen"){
+                SplashScreen(statusText = "Veriler yükleniyor...")
+
+                LaunchedEffect(Unit) {
+                    // Veri yükleme simülasyonu (Firebase / Room senkronizasyonu)
+                    delay(2000)
+
+                    // Home ekranına geçiş yap
+                    navController.navigate("home") {
+                        // Kullanıcı geri tuşuna bastığında Splash ekranına tekrar dönmesin
+                        popUpTo("openScreen") { inclusive = true }
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    @Composable
+    fun SplashScreen(
+        modifier: Modifier = Modifier,
+        statusText: String = "Veriler yükleniyor..."
+    ) {
+        // 1. Logo için hafif büyüme-küçülme (Pulsing) animasyonu
+        val infiniteTransition = rememberInfiniteTransition(label = "PulseAnimation")
+        val scale by infiniteTransition.animateFloat(
+            initialValue = 0.95f,
+            targetValue = 1.08f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "ScaleFloat"
+        )
+
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Color(0xFF2C353E)), // Koyu tema arka planı
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                // --- LOGO / İKON ALANI ---
+                Box(
+                    modifier = Modifier
+                        .scale(scale)
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF38434F)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Eğer özel bir resim (PNG/SVG) kullanmak istersen res/drawable içine atıp şunu açabilirsin:
+                    /*
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_app_logo),
+                        contentDescription = "App Logo",
+                        modifier = Modifier.size(70.dp)
+                    )
+                    */
+
+                    // Şimdilik varsayılan ikon kullanımı:
+                    Icon(
+                        imageVector = Icons.Default.DirectionsCar,
+                        contentDescription = "Auto Log Logo",
+                        modifier = Modifier.size(64.dp),
+                        tint = Color.White
                     )
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // --- UYGULAMA İSMİ ---
+                Text(
+                    text = "Auto Log",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.5.sp
+                    ),
+                    color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(48.dp))
+
+                // --- YÜKLEME İNDİKATÖRÜ VE METİN ---
+                CircularProgressIndicator(
+                    modifier = Modifier.size(36.dp),
+                    color = Color(0xFF4CAF50), // Yeşil accent tonu
+                    strokeWidth = 3.dp
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = statusText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.LightGray
+                )
             }
         }
     }
-}
+    @Composable
+    fun MainScreen(){
+        Scaffold(modifier = Modifier.fillMaxSize(), topBar = { AppBar() }) {
+            innerPadding ->
+            Column(modifier = Modifier.padding(innerPadding)) {
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+            }
+        }
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CarLogTheme {
-        Greeting("Android")
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun AppBar() {
+        TopAppBar(
+            title = { Text("Car Log", color = Color.White) },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = barBackground))
+
+
+    }
+
+
+    @Preview(showBackground = true)
+    @Composable
+    fun GreetingPreview() {
+
     }
 }
