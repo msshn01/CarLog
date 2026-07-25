@@ -68,12 +68,12 @@ class MainActivity : ComponentActivity() {
                 SplashScreen(statusText = "Veriler yükleniyor...")
 
                 LaunchedEffect(Unit) {
-                    // Veri yükleme simülasyonu (Firebase / Room senkronizasyonu)
+
                     delay(2000)
 
-                    // Home ekranına geçiş yap
+
                     navController.navigate("home") {
-                        // Kullanıcı geri tuşuna bastığında Splash ekranına tekrar dönmesin
+
                         popUpTo("openScreen") { inclusive = true }
                     }
                 }
@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
         modifier: Modifier = Modifier,
         statusText: String = "Veriler yükleniyor..."
     ) {
-        // 1. Logo için hafif büyüme-küçülme (Pulsing) animasyonu
+
         val infiniteTransition = rememberInfiniteTransition(label = "PulseAnimation")
         val scale by infiniteTransition.animateFloat(
             initialValue = 0.95f,
@@ -103,14 +103,14 @@ class MainActivity : ComponentActivity() {
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .background(Color(0xFF2C353E)), // Koyu tema arka planı
+                .background(Color(0xFF2C353E)),
             contentAlignment = Alignment.Center
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // --- LOGO / İKON ALANI ---
+
                 Box(
                     modifier = Modifier
                         .scale(scale)
@@ -119,16 +119,7 @@ class MainActivity : ComponentActivity() {
                         .background(Color(0xFF38434F)),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Eğer özel bir resim (PNG/SVG) kullanmak istersen res/drawable içine atıp şunu açabilirsin:
-                    /*
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_app_logo),
-                        contentDescription = "App Logo",
-                        modifier = Modifier.size(70.dp)
-                    )
-                    */
 
-                    // Şimdilik varsayılan ikon kullanımı:
                     Icon(
                         imageVector = Icons.Default.DirectionsCar,
                         contentDescription = "Auto Log Logo",
@@ -139,7 +130,7 @@ class MainActivity : ComponentActivity() {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // --- UYGULAMA İSMİ ---
+
                 Text(
                     text = "Auto Log",
                     style = MaterialTheme.typography.headlineLarge.copy(
@@ -152,10 +143,10 @@ class MainActivity : ComponentActivity() {
 
                 Spacer(modifier = Modifier.height(48.dp))
 
-                // --- YÜKLEME İNDİKATÖRÜ VE METİN ---
+
                 CircularProgressIndicator(
                     modifier = Modifier.size(36.dp),
-                    color = Color(0xFF4CAF50), // Yeşil accent tonu
+                    color = Color(0xFF4CAF50),
                     strokeWidth = 3.dp
                 )
 
