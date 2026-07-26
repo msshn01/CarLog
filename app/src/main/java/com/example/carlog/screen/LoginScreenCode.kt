@@ -80,7 +80,7 @@ fun LoginScreen(
                 ))
             Spacer(modifier = Modifier.padding(18.dp))
             Button(
-                onClick = { /* TODO: Login İşlemi */ },
+                onClick = {  },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 50.dp)
