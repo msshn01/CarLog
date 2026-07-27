@@ -1,5 +1,6 @@
 package com.example.carlog.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,6 +23,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,15 +36,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.carlog.R
 import com.example.carlog.ui.theme.hintColor
+import com.example.carlog.userInterface.auth.login.LoginViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: LoginViewModel = viewModel()
 ){
     Scaffold(
         modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -51,6 +58,12 @@ fun LoginScreen(
             , verticalArrangement = Arrangement.Center
 
         ) {
+            val uiState by viewModel.uiState.collectAsState()
+
+            // uiState her değiştiğinde bu blok otomatik olarak tekrar çalışır
+            LaunchedEffect(uiState) {
+                Log.e("StateTest", "Ekrandaki güncel state: $uiState")
+            }
             var email by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
 
@@ -80,7 +93,10 @@ fun LoginScreen(
                 ))
             Spacer(modifier = Modifier.padding(18.dp))
             Button(
-                onClick = {  },
+                onClick = {
+                    viewModel.loginUser(email, password)
+                    navController.navigate("home"){popUpTo("LoginScreen") {inclusive = true  }}
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 50.dp)
@@ -111,7 +127,7 @@ fun LoginScreen(
                 ,modifier = Modifier.clickable{ /* forgot password */})
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(text = "Kayıt ol", color = Color(0x92FFFFFF)
-                    ,modifier = Modifier.clickable {navController.navigate("registerScreen")}
+                    ,modifier = Modifier.clickable {navController.navigate("registerScreen"){popUpTo("loginScreen") { inclusive = true }} }
                 )
             }
 

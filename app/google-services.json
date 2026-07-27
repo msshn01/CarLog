@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "125880233548",
+    "project_id": "car-log-app-d56f4",
+    "storage_bucket": "car-log-app-d56f4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:125880233548:android:24c8a6c40e437573a90ee9",
+        "android_client_info": {
+          "package_name": "com.example.carlog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQGy6hHZfoyEqbEexVJajEIzJoTJcjwik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

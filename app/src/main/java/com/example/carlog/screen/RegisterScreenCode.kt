@@ -1,5 +1,6 @@
 package com.example.carlog.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,13 +33,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.carlog.R
 import com.example.carlog.ui.theme.hintColor
+import com.example.carlog.userInterface.auth.register.RegisterUiState
+import com.example.carlog.userInterface.auth.register.RegisterViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(){
+fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = viewModel()){
     Scaffold(
         modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -48,6 +55,18 @@ fun RegisterScreen(){
             var email by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
             var password2 by remember { mutableStateOf("") }
+
+            val uiState by viewModel.uiState.collectAsState()
+
+            // uiState her değiştiğinde bu blok otomatik olarak tekrar çalışır
+            LaunchedEffect(uiState) {
+                Log.e("StateTest", "Ekrandaki güncel state: $uiState")
+                if (uiState is RegisterUiState.Success){
+                    navController.navigate("home"){
+                        popUpTo("registerScreen") { inclusive = true }
+                    }
+                }
+            }
 
             //            TextField(value =itemName, onValueChange = { itemName = it }, placeholder = { Text("Enter name") })
             Image(painter = painterResource(id = R.drawable.logo), contentDescription = "Logo")
@@ -86,7 +105,9 @@ fun RegisterScreen(){
                 ))
             Spacer(modifier = Modifier.padding(18.dp))
             Button(
-                onClick = {  },
+                onClick = {
+                    viewModel.registerUser(email,password,password2)
+                          },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 50.dp)

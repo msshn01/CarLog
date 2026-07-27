@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,14 +14,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -31,10 +35,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.carlog.R
 import com.example.carlog.ui.theme.barBackground
+import com.example.carlog.userInterface.auth.uiModel.UserViewModel
 
 
 @Composable
@@ -58,7 +67,7 @@ fun SplashScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFF2C353E)),
+            .background(Color(0xFF000000)),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -75,11 +84,11 @@ fun SplashScreen(
                 contentAlignment = Alignment.Center
             ) {
 
-                Icon(
-                    imageVector = Icons.Default.DirectionsCar,
+                Image(
+                    painter = painterResource(R.drawable.logo),
                     contentDescription = "Auto Log Logo",
-                    modifier = Modifier.size(64.dp),
-                    tint = Color.White
+                    modifier = Modifier.fillMaxSize(),
+
                 )
             }
 
@@ -116,6 +125,35 @@ fun SplashScreen(
     }
 }
 
+
+
+
+
+@Composable
+fun MainScreen(
+    navController: NavController,
+    viewModel: UserViewModel = viewModel()
+) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = { AppBar() }
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+
+            Button(
+                onClick = {
+                    viewModel.logOut()
+                    navController.navigate("loginScreen") {
+                        popUpTo("mainScreen") { inclusive = true }
+                    }
+                }
+            ) {
+                Text("Log Out Test")
+            }
+
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
