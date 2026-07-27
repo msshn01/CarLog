@@ -144,7 +144,7 @@ fun MainScreen(
                 onClick = {
                     viewModel.logOut()
                     navController.navigate("loginScreen") {
-                        popUpTo("mainScreen") { inclusive = true }
+                        popUpTo("home") { inclusive = true }
                     }
                 }
             ) {

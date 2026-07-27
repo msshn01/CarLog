@@ -41,6 +41,7 @@ fun NavBar(){
 
 
                 val currentUser = auth.currentUser
+
                 if (currentUser != null) {
                     navController.navigate("home") {
                         popUpTo("openScreen") { inclusive = true }
