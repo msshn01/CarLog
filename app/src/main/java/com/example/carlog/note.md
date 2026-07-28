@@ -10,20 +10,20 @@ Uygulama; araç takibi, bakım/gider yönetimi, randevu sistemi, sigorta teklifl
 - [x] GitHub repository kurulumu ve yerel projeye bağlanması
 - [x] Splash / Yükleme ekranı (SplashScreen) tasarımı ve animasyonları
 - [x] Jetpack Navigation (NavBar / NavHost) rotalarının kurulması
-- [ ] MVVM + Clean Architecture temel paket yapısının (di, data, domain, ui) oluşturulması
+- [x] MVVM + Clean Architecture temel paket yapısının (di, data, domain, ui) oluşturulması
 - [ ] Dependency Injection (Hilt / Koin) entegrasyonu
 
 ### 1.2. Kimlik Doğrulama & Kullanıcı Yönetimi (Auth)
-- [ ] Firebase projesinin oluşturulması ve `google-services.json` eklenmesi
+- [x] Firebase projesinin oluşturulması ve `google-services.json` eklenmesi
 - [x] **Login Ekranı (Giriş Yap):**
-  - [ ] E-posta & Şifre alanları, validator kontrolleri (Email formatı, min 6 karakter)
-  - [ ] "Şifremi Unuttum" seçeneği ve sıfırlama e-postası gönderme akışı
-  - [ ] Google ile Giriş Yap (Google Sign-In) buton entegrasyonu
+  - [x] E-posta & Şifre alanları, validator kontrolleri (Email formatı, min 6 karakter)
+  - [] "Şifremi Unuttum" seçeneği ve sıfırlama e-postası gönderme akışı
+  - [] Google ile Giriş Yap (Google Sign-In) buton entegrasyonu
 - [x] **Register Ekranı (Kayıt Ol):**
-  - [ ] Ad-Soyad, E-posta, Şifre ve Şifre Tekrar form alanları
+  - [x] Ad-Soyad, E-posta, Şifre ve Şifre Tekrar form alanları
   - [ ] Kullanıcı sözleşmesi ve gizlilik politikası onay kutusu (Checkbox)
 - [ ] **Oturum Yönetimi:**
-  - [ ] Kullanıcı oturum durumunun (Beni Hatırla / Auto-Login) kontrolü
+  - [x] Kullanıcı oturum durumunun (Beni Hatırla / Auto-Login) kontrolü
 
 ### 1.3. Yerel Veritabanı & Offline-First Senkronizasyon
 - [ ] **Room Veritabanı:**
