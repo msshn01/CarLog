@@ -29,6 +29,14 @@ class AuthRepository (private val auth: FirebaseAuth = Firebase.auth){
         }
     }
 
+    suspend fun forgotPassword(email : String) : Result<String>{
+            return try {
+                auth.sendPasswordResetEmail(email).await()
+                Result.success("Şifre sıfırlama maili gönderildi.")
+            }catch (e : Exception){
+                Result.failure(e)
+            }
+    }
 
     fun logoutUser(){
         auth.signOut()

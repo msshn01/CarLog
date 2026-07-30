@@ -20,4 +20,6 @@ class UserViewModel(private var auth : FirebaseAuth = Firebase.auth,) : ViewMode
         }
 
     }
+
+
 }

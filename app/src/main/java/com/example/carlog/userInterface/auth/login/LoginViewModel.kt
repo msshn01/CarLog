@@ -18,27 +18,43 @@ class LoginViewModel(
     // 2. UI ve Navigation'ın okuyabileceği açık State
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
-    fun loginUser(email: String, password: String) {
-        // Validation (Boş alan kontrolü)
+    suspend fun loginUser(email: String, password: String): Boolean {
+        // Validation
         if (email.isBlank() || password.isBlank()) {
             _uiState.value = LoginUiState.Error("E-posta veya şifre boş olamaz.")
-            return
+            return false
         }
 
-        viewModelScope.launch {
-            // Yükleniyor durumuna geç
-            _uiState.value = LoginUiState.Loading
+        // Yükleniyor durumuna geç
+        _uiState.value = LoginUiState.Loading
 
-            // Repository üzerinden Firebase giriş fonksiyonunu çağır
-            val result = repository.loginUser(email, password)
+        // 2. 'launch' KULLANMADAN doğrudan repository isteğini atıp bekliyoruz
+        val result = repository.loginUser(email, password)
 
-            result.onSuccess { userId ->
+        return result.fold(
+            onSuccess = { userId ->
                 _uiState.value = LoginUiState.Success(userId)
-            }.onFailure { exception ->
+                true // Başarılıysa true döner
+            },
+            onFailure = { exception ->
                 _uiState.value = LoginUiState.Error(
                     exception.localizedMessage ?: "Giriş yapılırken bir hata oluştu."
                 )
+                false // Hata varsa false döner
             }
+        )
+    }
+
+    fun resetPasswordBcsForgot(email : String){
+        viewModelScope.launch {
+            repository.forgotPassword(email)
+            _uiState.value = LoginUiState.Success("Şifre sıfırlama maili gönderildi.")
         }
     }
+
+
+
+
+
+
 }

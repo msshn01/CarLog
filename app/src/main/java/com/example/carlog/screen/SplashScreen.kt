@@ -129,31 +129,6 @@ fun SplashScreen(
 
 
 
-@Composable
-fun MainScreen(
-    navController: NavController,
-    viewModel: UserViewModel = viewModel()
-) {
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = { AppBar() }
-    ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-
-            Button(
-                onClick = {
-                    viewModel.logOut()
-                    navController.navigate("loginScreen") {
-                        popUpTo("home") { inclusive = true }
-                    }
-                }
-            ) {
-                Text("Log Out Test")
-            }
-
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -17,12 +17,12 @@ Uygulama; araç takibi, bakım/gider yönetimi, randevu sistemi, sigorta teklifl
 - [x] Firebase projesinin oluşturulması ve `google-services.json` eklenmesi
 - [x] **Login Ekranı (Giriş Yap):**
     - [x] E-posta & Şifre alanları, validator kontrolleri (Email formatı, min 6 karakter)
-    - [] "Şifremi Unuttum" seçeneği ve sıfırlama e-postası gönderme akışı
+    - [x] "Şifremi Unuttum" seçeneği ve sıfırlama e-postası gönderme akışı
     - [] Google ile Giriş Yap (Google Sign-In) buton entegrasyonu
 - [x] **Register Ekranı (Kayıt Ol):**
     - [x] Ad-Soyad, E-posta, Şifre ve Şifre Tekrar form alanları
     - [ ] Kullanıcı sözleşmesi ve gizlilik politikası onay kutusu (Checkbox)
-- [ ] **Oturum Yönetimi:**
+- [x] **Oturum Yönetimi:**
     - [x] Kullanıcı oturum durumunun (Beni Hatırla / Auto-Login) kontrolü
 
 ### 1.3. Yerel Veritabanı & Offline-First Senkronizasyon
@@ -47,7 +47,7 @@ Uygulama; araç takibi, bakım/gider yönetimi, randevu sistemi, sigorta teklifl
 - [ ] Form doğrulama (KM alanı sayısal mı?, Plaka formatı doğru mu?)
 
 ### 2.2. Garaj & Çoklu Araç Mantığı
-- [ ] Ana ekranda aktif araç kartlarının gösterimi (LazyRow / Carousel)
+- [x] Ana ekranda aktif araç kartlarının gösterimi (LazyRow / Carousel)
 - [ ] Aktif aracı değiştirme / Varsayılan araç seçme mantığı
 - [ ] Araç detay ekranı ve silme/arşivleme opsiyonu
 
