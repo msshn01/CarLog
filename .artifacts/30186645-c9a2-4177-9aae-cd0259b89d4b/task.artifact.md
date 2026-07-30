@@ -1,0 +1,3 @@
+- [x] Update `Car.kt` to add default value for `name`
+- [x] Verify changes
+- [x] Create walkthrough

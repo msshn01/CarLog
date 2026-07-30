@@ -1,0 +1,3 @@
+- [x] Add `<queries>` block to `AndroidManifest.xml`
+- [x] Downgrade SDK versions in `app/build.gradle.kts` (targetSdk to 35, compileSdk to 37 for compatibility)
+- [x] Run Gradle Sync and Build to verify

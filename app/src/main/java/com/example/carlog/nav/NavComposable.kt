@@ -1,6 +1,7 @@
 package com.example.carlog.nav
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.filled.InsertChart
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,6 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.carlog.screen.AddCarScreen
 import com.example.carlog.screen.LoginScreen
 import com.example.carlog.screen.RegisterScreen
 import com.example.carlog.screen.SplashScreen
@@ -19,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.delay
 import com.example.carlog.screen.MainScreen
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun NavBar(){
@@ -27,26 +30,32 @@ fun NavBar(){
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "openScreen"){
         composable("home"){
+
             MainScreen(navController = navController)
         }
         composable("profil"){
 
         }
+        composable("logs"){}
+        composable("statistika"){}
+
+        composable("addCar"){
+            AddCarScreen(navController = navController)
+        }
+
         composable("loginScreen"){
             LoginScreen(navController)
         }
         composable("registerScreen"){
             RegisterScreen(navController)
         }
-        composable("detailCarScreen"){
-            Text(text = "DetailCarScreen", fontSize = 50.sp, modifier = Modifier.padding(40.dp))
-        }
+
         composable("openScreen"){
             SplashScreen(statusText = "Veriler yükleniyor...")
 
             LaunchedEffect(Unit) {
 
-                delay(2000)
+                delay(2000.milliseconds)
 
 
                 val currentUser = auth.currentUser
