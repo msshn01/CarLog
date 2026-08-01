@@ -1,10 +1,11 @@
 package com.example.carlog.screen
 
+import android.widget.Button
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -48,7 +49,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -60,16 +61,29 @@ import androidx.navigation.NavController
 
 import com.example.carlog.userInterface.auth.uiModel.UserViewModel
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.DirectionsCarFilled
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.LocalGasStation
+import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.Money
+import androidx.compose.material.icons.filled.MoneyOffCsred
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.carlog.data.remote.CarDataViewModel
 import com.example.carlog.model.Car
 
@@ -112,6 +126,8 @@ fun MainScreen(
                 carKm = string1
             }
             CarSelectedDashboard(carName,carKm)
+            DashboardQuickStatsSection()
+            InfoStatLazy(liste = listOf("","","","",""))
         }
     }
 }
@@ -288,10 +304,14 @@ fun Card(
                 text = name,
                 fontSize = 20.sp, // 30.sp başlık için biraz büyüktü, daha dengeli bir boyuta çekildi
                 fontWeight = FontWeight.Bold,
+                maxLines = 1, // Tek satıra sığdır
+                overflow = TextOverflow.Ellipsis,
                 color = Color(0xFF1B5E20)
             )
             Text(
                 text = "$km km",
+                maxLines = 1, // Tek satıra sığdır
+                overflow = TextOverflow.Ellipsis,
                 fontSize = 14.sp, // İkinci metni ikincil bilgi olduğu için küçülttük (Tipografi Hiyerarşisi)
                 color = Color.DarkGray
             )
@@ -503,13 +523,255 @@ private fun BottomNavItemSimple(
     }
 }
 
+@Composable
+fun DashboardQuickStatsSection(
+    modifier: Modifier = Modifier
+) {
+    // 1 Dış Column (İki satırı üst üste tutar)
+    Column(
+        modifier = modifier.fillMaxWidth().padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp) // Satırlar arası dikey boşluk
+    ) {
+        // --- 1. SATIR: Son Bakım & Muayene ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp) // Kartlar arası yatay boşluk
+        ) {
+            InfoStatCard(
+                title = "Son Bakım",
+                value = "12 Mar 2024",
+                subtitle = "(3.500 km önce)",
+                icon = Icons.Default.Build, // Wrench ikonu
+                modifier = Modifier.weight(1f) // Sol tarafı eşit kaplar
+            )
+            InfoStatCard(
+                title = "Muayene",
+                value = "180 Gün Kaldı",
+                subtitle = null,
+                icon = Icons.Default.Event, // Takvim ikonu
+                modifier = Modifier.weight(1f) // Sağ tarafı eşit kaplar
+            )
+        }
+
+        // --- 2. SATIR: Sigorta & Son Harcama ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            InfoStatCard(
+                title = "Sigorta",
+                value = "Bitiş: 15 Haz 2024",
+                subtitle = null,
+                icon = Icons.Default.Shield, // Kalkan ikonu
+                modifier = Modifier.weight(1f)
+            )
+            InfoStatCard(
+                title = "Son Harcama",
+                value = "1.200 ₺ (Yakıt)",
+                subtitle = null,
+                icon = Icons.Default.LocalGasStation, // Benzinlik ikonu
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+
+
+
+
+
+
+
+@Composable
+fun InfoStatLazy(
+    liste : List<String>
+){
+    Text(
+        text = "Araç bakım kayıtları",
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.Black,
+        textAlign = TextAlign.Center, // Metni kendi genişliği içinde ortalar
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    )
+    LazyColumn(modifier = Modifier.padding(7.dp)) {
+        items(liste) {
+            item ->
+
+            BottomCard("Yağ bakımı",  "Yağ castrol ile değişti","1.200 ₺","12 Mar 2024")
+            Spacer(Modifier.padding(5.dp))
+        }
+    }
+}
+
+
+
+@Composable
+fun InfoStatCard(
+    title: String,
+    value: String,
+    subtitle: String?,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.height(100.dp).clip(RoundedCornerShape(26.dp)),
+        color = Color(0xFFEFEFEF), // Görseldeki açık gri/lavanta tonu
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(6.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            // Başlık ve İkon Satırı
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Absolute.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = Color.Black
+                    )
+                    Text(
+                        text = title,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        color = Color.Black
+                    )
+                }
+            }
+
+            // Değer (Tarih / Gün / Tutar)
+            Text(
+                text = value,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.DarkGray
+            )
+
+            // Alt Detay (Varsa: Örn. 3.500 km önce)
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+            }
+            Spacer(Modifier.size(20.dp))
+        }
+    }
+}
+
+
+
+
+@Composable
+fun BottomCard(
+    title: String,
+    value: String,
+    money: String,
+    date: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        // Sabit height yerine padding vererek içeriğe göre yüksekliğinin esnemesini sağladık.
+        // Kenar yuvarlatmasını (shape) doğrudan Surface parametresinde verdik.
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp), // 36.dp yerine daha dengeli 20.dp Material 3 kavis oranı
+        color = Color(0xFFF5F5F5), // Şık, açık gri zemin
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 1. İkon Kutusu (Sol Taraf)
+            Surface(
+                shape = CircleShape,
+                color = Color(0xFF2E7D32).copy(alpha = 0.12f),
+                modifier = Modifier.size(40.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.MonetizationOn,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = Color(0xFF2E7D32)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // 2. Sol-Orta Kısım: Başlık, Açıklama (value) ve Tarih
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                // İşlem Başlığı (Örn: Yağ Değişimi)
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    color = Color.Black
+                )
+
+                // Ek Açıklama / Detay (Örn: Motul 5W-40)
+                if (value.isNotBlank()) {
+                    Text(
+                        text = value,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 13.sp,
+                        color = Color.DarkGray
+                    )
+                }
+
+                // Tarih (Daha küçük ve açık ton)
+                Text(
+                    text = date,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 11.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // 3. Sağ Kısım: Tutar (money) Vurgusu
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFE8F5E9) // Yeşilimsi tatlı bir vurgu kutusu
+            ) {
+                Text(
+                    text = money,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = Color(0xFF2E7D32),
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                )
+            }
+        }
+    }
+}
 
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-
-    
+    BottomCard("Yağ bakımı","Yağ castrol ile değişti","1.200 ₺","12 Mar 2024")
 }
 
 
