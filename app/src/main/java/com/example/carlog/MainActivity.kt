@@ -35,15 +35,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.carlog.nav.NavBar
-import com.example.carlog.screen.Card
-import org.intellij.lang.annotations.JdkConstants
+import com.example.carlog.ui.theme.CarLogTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            NavBar()
+            CarLogTheme {
+                NavBar()
+            }
         }
     }
 

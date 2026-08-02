@@ -97,13 +97,13 @@ class CarDataViewModel(
     /**
      * Seçili araca yeni bir bakım kaydı ekler.
      */
-    fun addMaintenance(carId: String, maintenanceText: String, onSuccess: () -> Unit = {}) {
+    fun addMaintenance(carId: String, maintenance: com.example.carlog.model.Maintenance, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
 
             try {
-                repository.addMaintenance(carId, maintenanceText)
+                repository.addMaintenance(carId, maintenance)
                 _isLoading.value = false
                 onSuccess()
             } catch (e: Exception) {

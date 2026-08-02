@@ -1,7 +1,6 @@
 package com.example.carlog.screen
 
-import android.widget.Button
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -60,32 +59,26 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
 import com.example.carlog.userInterface.auth.uiModel.UserViewModel
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.DirectionsCarFilled
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.LocalGasStation
 import androidx.compose.material.icons.filled.MonetizationOn
-import androidx.compose.material.icons.filled.Money
-import androidx.compose.material.icons.filled.MoneyOffCsred
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.carlog.data.remote.CarDataViewModel
 import com.example.carlog.model.Car
+import com.example.carlog.model.Maintenance
+import kotlinx.coroutines.flow.firstOrNull
 
 /*
     viewModel.logOut()
@@ -101,10 +94,13 @@ fun MainScreen(
     viewModel2: CarDataViewModel = viewModel(),
     navController: NavController
 ) {
-    var carName by remember { mutableStateOf("Seçilmedi") }
-    var carKm by remember { mutableStateOf("Seçilmedi") }
+    var selectedCarId by remember { mutableStateOf("") }
+
     val carList by viewModel2.cars.collectAsState()
+     // Varsayılan araç
     val isLoading by viewModel2.isLoading.collectAsState()
+    val selectedCar = carList.firstOrNull { it.id == selectedCarId } ?: carList.firstOrNull()
+
     Scaffold(bottomBar = { SimpleBottomBar(navController) },
         floatingActionButton = {
             AddLogFloatingActionButton {
@@ -117,17 +113,32 @@ fun MainScreen(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(innerPadding)) {
-
-            CarCardLazy(navController = navController, list = carList){
-                string, string1 ->
-                carName = string
-                carKm = string1
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else if (carList.isEmpty()) {
+                Text(
+                    text = "Henüz araç eklenmemiş.",
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                selectedCar?.let { car ->
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        CarCardLazy(navController = navController, list = carList) { selected ->
+                            selectedCarId = selected.id
+                        }
+                        CarSelectedDashboard(car, onAddMaintenanceClick = {
+                            navController.navigate("addMaintenance/${car.id}")
+                        })
+                        DashboardQuickStatsSection()
+                        InfoStatLazy(car.maintenanceList, modifier = Modifier.weight(1f))
+                    }
+                }
             }
-            CarSelectedDashboard(carName,carKm)
-            DashboardQuickStatsSection()
-            InfoStatLazy(liste = listOf("","","","",""))
         }
     }
 }
@@ -135,8 +146,8 @@ fun MainScreen(
 
 @Composable
 fun CarSelectedDashboard(
-    name: String,
-    km : String
+   car : Car,
+   onAddMaintenanceClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -144,74 +155,199 @@ fun CarSelectedDashboard(
             .padding(16.dp) // Dış çerçevenin genel ekran padding'i
     ) {
         // 1. Seçili Araç Kartı
-        SelectedCarCard(name,km)
+        SelectedCarCard(car, onAddMaintenanceClick = onAddMaintenanceClick)
 
     }
 }
 
 
 @Composable
+fun UpdateKmDialog(
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit
+) {
+    // Giriş yapılan yeni KM değerini tutan yerel state
+    var newKmText by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(20.dp),
+        containerColor = Color.White,
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Speed,
+                contentDescription = null,
+                tint = Color(0xFF2E7D32),
+                modifier = Modifier.size(32.dp)
+            )
+        },
+        title = {
+            Text(
+                text = "Kilometre Güncelle",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+        },
+        text = {
+            OutlinedTextField(
+                value = newKmText,
+                onValueChange = { newInput ->
+                    if (newInput.isEmpty() || newInput.all { it.isDigit() }) {
+                        newKmText = newInput
+                    }
+                },
+                label = { Text("Yeni KM Değeri") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF2E7D32),
+                    focusedLabelColor = Color(0xFF2E7D32),
+                    cursorColor = Color(0xFF2E7D32)
+                )
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onSave(newKmText)
+                    onDismiss()
+                },
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2E7D32),
+                    contentColor = Color.White
+                )
+            ) {
+                Text("Kaydet", fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("İptal", color = Color.Gray)
+            }
+        }
+    )
+}
+@Composable
 fun SelectedCarCard(
-    name : String,
-    km : String
+    car : Car,
+    onAddMaintenanceClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: CarDataViewModel = viewModel()
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F8E9)),
-        modifier = Modifier.fillMaxWidth().height(150.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F8E9)), // Açık yeşil zemin
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = modifier.fillMaxWidth(),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Sol Araç İkonu
-            Icon(
-                imageVector = Icons.Default.DirectionsCar,
-                contentDescription = null,
-                modifier = Modifier.size(48.dp)
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // Sağ Metinler ve Buton Alanı
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = name,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-
-                Spacer(modifier = Modifier.height(30.dp))
-
-                // KM Yazısı ve Buton Yan Yana!
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Km: $km",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.DarkGray
-                    )
-
-
-                }
+        var showKmDialog by remember { mutableStateOf(false) }
+        if (showKmDialog){
+            UpdateKmDialog(onDismiss = { showKmDialog = false }){
+                newKm ->
+                // KM güncelleme işlemi burada yapılabilir
+                viewModel.changeKm(carId =car.id, newKm = newKm)
 
             }
 
         }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // ÜST SATIR: İkon + Araç Adı & KM Bilgisi
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Sol Araç İkon Kutusu
+                Surface(
+                    shape = CircleShape,
+                    color = Color(0xFF2E7D32).copy(alpha = 0.15f),
+                    modifier = Modifier.size(52.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.DirectionsCar,
+                            contentDescription = null,
+                            tint = Color(0xFF2E7D32),
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
 
+                Spacer(modifier = Modifier.width(14.dp))
+
+                // Araç İsmi ve Kilometre Bilgisi
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = car.name,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1B5E20)
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "KM: ${car.km}",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.DarkGray
+                    )
+                }
+            }
+
+            // ALT SATIR: Butonlar (KM Güncelle & Bakım Ekle)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // KM Güncelle Butonu
+                OutlinedButton(
+                    onClick = {showKmDialog = true},
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(0xFF2E7D32)
+                    ),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(text = "KM Güncelle", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                }
+
+                // Bakım Ekle Butonu
+                Button(
+                    onClick = onAddMaintenanceClick,
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2E7D32),
+                        contentColor = Color.White
+                    ),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(text = "Bakım Ekle", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
     }
 }
+
 
 @Composable
 fun AddLogFloatingActionButton(
@@ -236,7 +372,7 @@ fun CarCardLazy(
     list: List<Car>,
     modifier: Modifier = Modifier,
     navController: NavController,
-    onCardClick: (String, String) -> Unit
+    onCardClick: (Car) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
@@ -259,14 +395,12 @@ fun CarCardLazy(
             items(
                 items = list
             ) { item ->
-                Card(navController = navController,
-                    name = item.name,
-                    km = "Km ${item.km}",
-                    // 4. Kartların ekranda düzgün, eşit ve sabit bir genişlikte durması için width veriyoruz:
+                Card(car = item,
+                    navController = navController,
                     modifier = Modifier.width(220.dp)
                 ){
 
-                    onCardClick(item.name,item.km)
+                    onCardClick(item)
                 }
             }
         }
@@ -276,9 +410,8 @@ fun CarCardLazy(
 
 @Composable
 fun Card(
-    name: String
-    , km: String
-    , modifier: Modifier = Modifier
+    car: Car,
+    modifier: Modifier = Modifier
     ,navController: NavController
     ,onCardClick: (String) -> Unit
 ) {
@@ -290,7 +423,7 @@ fun Card(
             .background(Color(0xFFA5D6A7)) // Hafif tatlı bir yeşil tonu (istediğin renkle değiştirebilirsin)
             .padding(16.dp)
             .clickable {
-                onCardClick(name)
+                onCardClick(car.name)
             }
             ,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -301,7 +434,7 @@ fun Card(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = name,
+                text = car.name,
                 fontSize = 20.sp, // 30.sp başlık için biraz büyüktü, daha dengeli bir boyuta çekildi
                 fontWeight = FontWeight.Bold,
                 maxLines = 1, // Tek satıra sığdır
@@ -309,7 +442,7 @@ fun Card(
                 color = Color(0xFF1B5E20)
             )
             Text(
-                text = "$km km",
+                text = "${car.km} km",
                 maxLines = 1, // Tek satıra sığdır
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 14.sp, // İkinci metni ikincil bilgi olduğu için küçülttük (Tipografi Hiyerarşisi)
@@ -585,9 +718,11 @@ fun DashboardQuickStatsSection(
 
 @Composable
 fun InfoStatLazy(
-    liste : List<String>
+    list: MutableList<Maintenance>,
+    modifier: Modifier = Modifier
 ){
-    Text(
+    Column(modifier = modifier) {
+        Text(
         text = "Araç bakım kayıtları",
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
@@ -598,12 +733,11 @@ fun InfoStatLazy(
             .padding(10.dp)
     )
     LazyColumn(modifier = Modifier.padding(7.dp)) {
-        items(liste) {
-            item ->
-
-            BottomCard("Yağ bakımı",  "Yağ castrol ile değişti","1.200 ₺","12 Mar 2024")
+        items(list) { item ->
+            BottomCard(item.title, item.description, item.price, item.date)
             Spacer(Modifier.padding(5.dp))
         }
+    }
     }
 }
 
@@ -771,7 +905,7 @@ fun BottomCard(
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    BottomCard("Yağ bakımı","Yağ castrol ile değişti","1.200 ₺","12 Mar 2024")
+
 }
 
 

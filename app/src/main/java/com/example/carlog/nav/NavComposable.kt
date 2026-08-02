@@ -43,6 +43,11 @@ fun NavBar(){
             AddCarScreen(navController = navController)
         }
 
+        composable("addMaintenance/{carId}") { backStackEntry ->
+            val carId = backStackEntry.arguments?.getString("carId") ?: ""
+            com.example.carlog.screen.AddMaintenanceScreen(navController = navController, carId = carId)
+        }
+
         composable("loginScreen"){
             LoginScreen(navController)
         }

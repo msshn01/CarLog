@@ -172,7 +172,7 @@ fun AddCarScreen(
                             model = carModel.ifBlank { null },
                             year = carYear.ifBlank { null },
                             km = carKm.ifBlank { "0" },
-                            maintenanceList = mutableListOf("Garaja Kayıt Edildi")
+                            maintenanceList = mutableListOf()
                         )
 
                         // ViewModel üzerinden kaydetme tetiklenir

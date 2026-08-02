@@ -37,8 +37,17 @@ class CarRepository {
 
                 if (snapshot != null) {
                     // Firestore dokümanlarını Car nesnelerine dönüştürüyoruz
-                    val cars = snapshot.documents.mapNotNull { doc ->
-                        doc.toObject(Car::class.java)
+                    val cars = mutableListOf<Car>()
+                    for (doc in snapshot.documents) {
+                        try {
+                            val car = doc.toObject(Car::class.java)
+                            if (car != null) {
+                                cars.add(car)
+                            }
+                        } catch (e: Exception) {
+                            // Hatalı veya eski formatlı veriyi logla ve atla
+                            android.util.Log.e("CarRepository", "Deserialization error for doc ${doc.id}: ${e.message}")
+                        }
                     }
                     trySend(cars) // Akışa yeni listeyi fırlatır
                 }
@@ -87,14 +96,14 @@ class CarRepository {
             .await()
     }
 
-    suspend fun addMaintenance(carId: String, maintenanceText: String) {
+    suspend fun addMaintenance(carId: String, maintenance: com.example.carlog.model.Maintenance) {
         val uid = currentUserId ?: throw Exception("Oturum açık değil!")
 
         firestore.collection("users")
             .document(uid)
             .collection("cars")
             .document(carId)
-            .update("maintenanceList", FieldValue.arrayUnion(maintenanceText))
+            .update("maintenanceList", FieldValue.arrayUnion(maintenance))
             .await()
     }
 }
