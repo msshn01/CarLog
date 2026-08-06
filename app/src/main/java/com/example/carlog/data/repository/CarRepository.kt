@@ -84,6 +84,8 @@ class CarRepository {
             "model" to car.model,
             "year" to car.year,
             "km" to car.km,
+            "muayeneTarihi" to car.muayeneTarihi,
+            "sigortaTarihi" to car.sigortaTarihi,
             "maintenanceList" to car.maintenanceList
         )
 
@@ -104,6 +106,17 @@ class CarRepository {
             .collection("cars")
             .document(carId)
             .update("maintenanceList", FieldValue.arrayUnion(maintenance))
+            .await()
+    }
+
+    suspend fun deleteCar(carId: String) {
+        val uid = currentUserId ?: throw Exception("Oturum açık değil!")
+
+        firestore.collection("users")
+            .document(uid)
+            .collection("cars")
+            .document(carId)
+            .delete()
             .await()
     }
 }

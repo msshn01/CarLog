@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.gms.google-services")
 }
 
 android {
@@ -80,4 +79,9 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore")
 
+    // WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.11.2")
+
 }
+
+apply(plugin = "com.google.gms.google-services")

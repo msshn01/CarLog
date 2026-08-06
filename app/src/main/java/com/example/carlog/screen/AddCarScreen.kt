@@ -20,26 +20,11 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.DirectionsCarFilled
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -52,6 +37,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.carlog.data.remote.CarDataViewModel
 import com.example.carlog.model.Car
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +58,12 @@ fun AddCarScreen(
     var carModel by remember { mutableStateOf("") }
     var carYear by remember { mutableStateOf("") }
     var carKm by remember { mutableStateOf("") }
+    var carMuayene by remember { mutableStateOf("") }
+    var carSigorta by remember { mutableStateOf("") }
+
+    // Date Picker States
+    var showMuayenePicker by remember { mutableStateOf(false) }
+    var showSigortaPicker by remember { mutableStateOf(false) }
 
     // Hata mesajı varsa Toast gösterip state'i temizleme
     LaunchedEffect(errorMessage) {
@@ -80,14 +73,35 @@ fun AddCarScreen(
         }
     }
 
+    // Date Picker Dialogs
+    if (showMuayenePicker) {
+        DatePickerModal(
+            onDateSelected = { 
+                carMuayene = it
+                showMuayenePicker = false 
+            },
+            onDismiss = { showMuayenePicker = false }
+        )
+    }
+
+    if (showSigortaPicker) {
+        DatePickerModal(
+            onDateSelected = { 
+                carSigorta = it
+                showSigortaPicker = false 
+            },
+            onDismiss = { showSigortaPicker = false }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = "Yeni Araç Ekle",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp
                     )
                 },
                 navigationIcon = {
@@ -101,7 +115,7 @@ fun AddCarScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -110,11 +124,11 @@ fun AddCarScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // 1. Marka / İsim
             CarInputField(
@@ -137,7 +151,7 @@ fun AddCarScreen(
             // 3. Yıl ve KM (Yan Yana)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Box(modifier = Modifier.weight(1f)) {
                     CarInputField(
@@ -161,7 +175,36 @@ fun AddCarScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            // 4. Muayene ve Sigorta (Yan Yana) - Artık tıklanabilir
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Box(modifier = Modifier.weight(1f)) {
+                    CarInputField(
+                        value = carMuayene,
+                        onValueChange = { carMuayene = it },
+                        label = "Muayene Bitiş",
+                        placeholder = "Seçiniz",
+                        leadingIcon = Icons.Default.Event,
+                        readOnly = true,
+                        onClick = { showMuayenePicker = true }
+                    )
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    CarInputField(
+                        value = carSigorta,
+                        onValueChange = { carSigorta = it },
+                        label = "Sigorta Bitiş",
+                        placeholder = "Seçiniz",
+                        leadingIcon = Icons.Default.Shield,
+                        readOnly = true,
+                        onClick = { showSigortaPicker = true }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Kaydet Butonu
             Button(
@@ -172,42 +215,77 @@ fun AddCarScreen(
                             model = carModel.ifBlank { null },
                             year = carYear.ifBlank { null },
                             km = carKm.ifBlank { "0" },
+                            muayeneTarihi = carMuayene,
+                            sigortaTarihi = carSigorta,
                             maintenanceList = mutableListOf()
                         )
 
-                        // ViewModel üzerinden kaydetme tetiklenir
                         viewModel.saveCar(newCar) {
                             Toast.makeText(context, "${newCar.name} garaja eklendi!", Toast.LENGTH_SHORT).show()
-                            // Kayıt başarılı olduğunda ana ekrana döner
                             navController.popBackStack()
                         }
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(54.dp),
-                shape = RoundedCornerShape(14.dp),
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF2E7D32)
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
-                enabled = !isLoading && carName.isNotBlank() // Yüklenirken veya isim boşken tıklanamaz
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                enabled = !isLoading && carName.isNotBlank()
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
                         color = Color.White,
                         modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.5.dp
+                        strokeWidth = 3.dp
                     )
                 } else {
                     Text(
                         text = "Garaja Kaydet",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(20.dp))
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerModal(
+    onDateSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+    val selectedDate = datePickerState.selectedDateMillis?.let {
+        val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+        sdf.format(Date(it))
+    } ?: ""
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                if (selectedDate.isNotEmpty()) {
+                    onDateSelected(selectedDate)
+                }
+                onDismiss()
+            }) {
+                Text("Seç")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("İptal")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
     }
 }
 
@@ -219,28 +297,45 @@ private fun CarInputField(
     label: String,
     placeholder: String,
     leadingIcon: ImageVector,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    readOnly: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = { Text(label, fontWeight = FontWeight.Medium) },
         placeholder = { Text(placeholder, color = Color.Gray) },
         leadingIcon = {
             Icon(
                 imageVector = leadingIcon,
                 contentDescription = null,
-                tint = Color(0xFF2E7D32)
+                tint = MaterialTheme.colorScheme.primary
             )
         },
         singleLine = true,
+        readOnly = readOnly,
+        enabled = true,
+        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+            .also { interactionSource ->
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions.collect {
+                        if (it is androidx.compose.foundation.interaction.PressInteraction.Release) {
+                            if (readOnly) onClick()
+                        }
+                    }
+                }
+            },
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFF2E7D32),
-            focusedLabelColor = Color(0xFF2E7D32),
-            unfocusedBorderColor = Color(0xFFE0E0E0)
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = Color(0xFFE0E0E0),
+            focusedContainerColor = if (readOnly) Color(0xFFF5F5F5) else Color.Transparent,
+            unfocusedContainerColor = if (readOnly) Color(0xFFF5F5F5) else Color.Transparent
         ),
         modifier = Modifier.fillMaxWidth()
     )
 }
+

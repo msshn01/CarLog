@@ -10,5 +10,7 @@ data class Car(
     val model: String? = null,
     val year: String? = null,
     val km: String = "0",
+    val muayeneTarihi: String = "",
+    val sigortaTarihi: String = "",
     val maintenanceList: MutableList<Maintenance> = mutableListOf()
 )

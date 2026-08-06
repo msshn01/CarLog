@@ -113,6 +113,21 @@ class CarDataViewModel(
         }
     }
 
+    fun deleteCar(carId: String, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                repository.deleteCar(carId)
+                _isLoading.value = false
+                onSuccess()
+            } catch (e: Exception) {
+                _isLoading.value = false
+                _errorMessage.value = e.localizedMessage ?: "Araç silinirken bir hata oluştu."
+            }
+        }
+    }
+
     /**
      * Ekran değiştikten veya hata gösterildikten sonra hata durumunu sıfırlamak için
      */

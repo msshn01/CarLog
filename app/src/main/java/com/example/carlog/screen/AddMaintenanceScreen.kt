@@ -40,11 +40,24 @@ fun AddMaintenanceScreen(
     var price by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
 
+    // Date Picker State
+    var showDatePicker by remember { mutableStateOf(false) }
+
     LaunchedEffect(errorMessage) {
         errorMessage?.let { error ->
             Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
             viewModel.clearError()
         }
+    }
+
+    if (showDatePicker) {
+        DatePickerModal(
+            onDateSelected = { 
+                date = it
+                showDatePicker = false 
+            },
+            onDismiss = { showDatePicker = false }
+        )
     }
 
     Scaffold(
@@ -53,8 +66,8 @@ fun AddMaintenanceScreen(
                 title = {
                     Text(
                         text = "Bakım Kaydı Ekle",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp
                     )
                 },
                 navigationIcon = {
@@ -62,7 +75,7 @@ fun AddMaintenanceScreen(
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Geri")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         }
     ) { innerPadding ->
@@ -70,11 +83,11 @@ fun AddMaintenanceScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             MaintenanceInputField(
                 value = title,
@@ -96,7 +109,7 @@ fun AddMaintenanceScreen(
                 value = price,
                 onValueChange = { price = it },
                 label = "Tutar (₺)",
-                placeholder = "1.500",
+                placeholder = "1500",
                 leadingIcon = Icons.Default.MonetizationOn,
                 keyboardType = KeyboardType.Number
             )
@@ -105,11 +118,13 @@ fun AddMaintenanceScreen(
                 value = date,
                 onValueChange = { date = it },
                 label = "Tarih",
-                placeholder = "Örn: 12 Mart 2024",
-                leadingIcon = Icons.Default.Event
+                placeholder = "Seçiniz",
+                leadingIcon = Icons.Default.Event,
+                readOnly = true,
+                onClick = { showDatePicker = true }
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             Button(
                 onClick = {
@@ -128,23 +143,23 @@ fun AddMaintenanceScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(54.dp),
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 enabled = !isLoading && title.isNotBlank()
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
                         color = Color.White,
                         modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.5.dp
+                        strokeWidth = 3.dp
                     )
                 } else {
                     Text(
                         text = "Bakımı Kaydet",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -159,28 +174,45 @@ private fun MaintenanceInputField(
     label: String,
     placeholder: String,
     leadingIcon: ImageVector,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    readOnly: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = { Text(label, fontWeight = FontWeight.Medium) },
         placeholder = { Text(placeholder, color = Color.Gray) },
         leadingIcon = {
             Icon(
                 imageVector = leadingIcon,
                 contentDescription = null,
-                tint = Color(0xFF2E7D32)
+                tint = MaterialTheme.colorScheme.primary
             )
         },
         singleLine = true,
+        readOnly = readOnly,
+        enabled = true,
+        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+            .also { interactionSource ->
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions.collect {
+                        if (it is androidx.compose.foundation.interaction.PressInteraction.Release) {
+                            if (readOnly) onClick()
+                        }
+                    }
+                }
+            },
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFF2E7D32),
-            focusedLabelColor = Color(0xFF2E7D32),
-            unfocusedBorderColor = Color(0xFFE0E0E0)
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = Color(0xFFE0E0E0),
+            focusedContainerColor = if (readOnly) Color(0xFFF5F5F5) else Color.Transparent,
+            unfocusedContainerColor = if (readOnly) Color(0xFFF5F5F5) else Color.Transparent
         ),
         modifier = Modifier.fillMaxWidth()
     )
 }
+

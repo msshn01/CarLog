@@ -40,33 +40,31 @@ Uygulama; araç takibi, bakım/gider yönetimi, randevu sistemi, sigorta teklifl
 ## 🚘 Faz 2: Garaj & Araç Yönetimi (Vehicle Profile)
 
 ### 2.1. Araç Ekleme & Düzenleme (Add/Edit Vehicle)
-- [ ] **Form Ekranı UI:**
-    - [ ] Marka / Model seçimi (Dropdown / AutoComplete)
-    - [ ] Yıl, Renk, Şasi No (VIN), Plaka ve Güncel KM input alanları
-    - [ ] Araç fotoğrafı ekleme (Galeriden seçme veya Kameradan çekme)
-- [ ] Form doğrulama (KM alanı sayısal mı?, Plaka formatı doğru mu?)
+- [x] **Form Ekranı UI:**
+    - [x] Marka / Model seçimi
+    - [x] Yıl, Güncel KM input alanları
+    - [x] Muayene ve Sigorta tarih seçicileri (Date Picker)
+- [x] Form doğrulama (KM alanı sayısal mı?, Boş alan kontrolü)
 
 ### 2.2. Garaj & Çoklu Araç Mantığı
 - [x] Ana ekranda aktif araç kartlarının gösterimi (LazyRow / Carousel)
-- [ ] Aktif aracı değiştirme / Varsayılan araç seçme mantığı
-- [ ] Araç detay ekranı ve silme/arşivleme opsiyonu
+- [x] Aktif aracı değiştirme / Varsayılan araç seçme mantığı
+- [x] Araç detay ekranı ve silme opsiyonu
 
 ---
 
 ## 🛠️ Faz 3: Bakım Takibi & Akıllı Bildirimler
 
 ### 3.1. Bakım Kaydı (Maintenance Logging)
-- [ ] **Bakım Ekleme Ekranı:**
-    - [ ] Yapılan işlem türü (Yağ/Filtre, Fren, Triger, Buji vb.)
-    - [ ] İşlem tarihi, yapıldığı KM, kullanılan parça markaları ve toplam ücret
-    - [ ] Fatura / Fiş fotoğrafı yükleme alanı
-- [ ] Bakım geçmişi listeleme ekranı ve detay sayfası
+- [x] **Bakım Ekleme Ekranı:**
+    - [x] Yapılan işlem türü (Yağ/Filtre, Fren, Triger, Buji vb.)
+    - [x] İşlem tarihi (Date Picker), yapıldığı KM, ve toplam ücret
+- [x] Bakım geçmişi listeleme (Ana ekran üzerinde akıcı liste)
 
 ### 3.2. Akıllı Uyarı & Bildirim Sistemi
-- [ ] KM veya zaman bazlı kalan ömür hesaplama algoritması *(Örn: 10.000 km veya 1 yıl)*
-- [ ] **Local Push Notifications (Cihaz Bildirimleri):**
-    - [ ] Muayene tarihi yaklaşınca bildirim gönderme
-    - [ ] Periyodik bakım KM'sine 1.000 km kala uyarı verme
+- [x] KM veya zaman bazlı kalan ömür hesaplama ve görselleştirme (Progress Bar)
+- [x] **Local Push Notifications (Cihaz Bildirimleri):**
+    - [x] Muayene ve Sigorta tarihi yaklaşınca periyodik bildirim gönderme (WorkManager)
 
 ---
 
@@ -103,8 +101,8 @@ Uygulama; araç takibi, bakım/gider yönetimi, randevu sistemi, sigorta teklifl
 ## 🛡️ Faz 6: Sigorta, Kasko & Sponsorlu Reklamlar
 
 ### 6.1. Poliçe Takibi
-- [ ] Sigorta & Kasko bitiş tarihleri, poliçe numarası ve acenta iletişim kartı
-- [ ] Poliçe bitimine 30/15/3 gün kala otomatik hatırlatıcılar
+- [x] Sigorta & Kasko bitiş tarihleri takibi
+- [x] Poliçe bitimine 4 ay kala başlayan aylık hatırlatıcılar
 
 ### 6.2. Monetization (Gelir Modülü)
 - [ ] Google AdMob entegrasyonu (Banner & Geçiş reklamları)

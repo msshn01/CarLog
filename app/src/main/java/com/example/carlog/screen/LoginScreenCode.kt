@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -42,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -87,6 +89,11 @@ fun LoginScreen(
                 , onValueChange = { email = it }
                 , modifier = Modifier.fillMaxWidth().padding(horizontal = 50.dp)
                 , placeholder = { Text("Enter email", color = hintColor) }
+                , singleLine = true
+                , keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                )
                 , shape = CircleShape,colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,   // Odaklanıldığında (yazı yazarken) metin rengi
                     unfocusedTextColor = Color.White, // Odak dışındayken metin rengi
@@ -102,6 +109,7 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 50.dp),
                 placeholder = { Text("Enter password", color = hintColor) },
+                singleLine = true,
                 shape = CircleShape,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,   // Odaklanıldığında metin rengi
@@ -120,7 +128,21 @@ fun LoginScreen(
 
                 // 2. Klavye Tipi (Otomatik tamamlamayı ve kaydetmeyi kısıtlar)
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        scope.launch {
+                            val isSuccess = viewModel.loginUser(email, password)
+                            if (isSuccess){
+                                navController.navigate("home"){
+                                    popUpTo("loginScreen") { inclusive = true }
+                                }
+                            }
+                        }
+                    }
                 ),
 
                 // 3. Sağ Taraftaki Göster/Gizle Göz İkonu

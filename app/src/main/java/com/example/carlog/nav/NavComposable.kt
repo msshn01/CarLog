@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.delay
 import com.example.carlog.screen.MainScreen
+import com.example.carlog.screen.ProfileScreen
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -34,10 +35,18 @@ fun NavBar(){
             MainScreen(navController = navController)
         }
         composable("profil"){
-
+            ProfileScreen(onLogout = {
+                navController.navigate("loginScreen") {
+                    popUpTo("home") { inclusive = true }
+                }
+            })
         }
-        composable("logs"){}
-        composable("statistika"){}
+        composable("logs"){
+            com.example.carlog.screen.RecordsScreen()
+        }
+        composable("statistika"){
+            com.example.carlog.screen.StatsScreen()
+        }
 
         composable("addCar"){
             AddCarScreen(navController = navController)

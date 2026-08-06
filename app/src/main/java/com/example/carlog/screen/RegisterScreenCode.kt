@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -84,6 +86,11 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
                 , onValueChange = { email = it }
                 , modifier = Modifier.fillMaxWidth().padding(horizontal = 50.dp)
                 , placeholder = { Text("Enter email", color = hintColor) }
+                , singleLine = true
+                , keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                )
                 , shape = CircleShape,colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,   // Odaklanıldığında (yazı yazarken) metin rengi
                     unfocusedTextColor = Color.White, // Odak dışındayken metin rengi
@@ -96,6 +103,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
                 , onValueChange = { password = it }
                 , modifier = Modifier.fillMaxWidth().padding(horizontal = 50.dp)
                 , placeholder = { Text("Enter password", color = hintColor) }
+                , singleLine = true
                 , shape = CircleShape,colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,   // Odaklanıldığında (yazı yazarken) metin rengi
                     unfocusedTextColor = Color.White, // Odak dışındayken metin rengi
@@ -110,7 +118,8 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
 
                 // 2. Klavye Tipi (Otomatik tamamlamayı ve kaydetmeyi kısıtlar)
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
                 ),
 
                 // 3. Sağ Taraftaki Göster/Gizle Göz İkonu
@@ -137,6 +146,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
                 , onValueChange = { password2 = it }
                 , modifier = Modifier.fillMaxWidth().padding(horizontal = 50.dp)
                 , placeholder = { Text("Enter password again", color = hintColor) }
+                , singleLine = true
                 , shape = CircleShape,colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,   // Odaklanıldığında (yazı yazarken) metin rengi
                     unfocusedTextColor = Color.White, // Odak dışındayken metin rengi
@@ -151,7 +161,14 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
 
                 // 2. Klavye Tipi (Otomatik tamamlamayı ve kaydetmeyi kısıtlar)
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        viewModel.registerUser(email, password, password2)
+                    }
                 ),
 
                 // 3. Sağ Taraftaki Göster/Gizle Göz İkonu
