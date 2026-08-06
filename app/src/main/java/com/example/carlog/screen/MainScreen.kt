@@ -99,7 +99,13 @@ fun MainScreen(
     val carList by viewModel2.cars.collectAsState()
      // Varsayılan araç
     val isLoading by viewModel2.isLoading.collectAsState()
-    val selectedCar = carList.firstOrNull { it.id == selectedCarId } ?: carList.firstOrNull()
+    val selectedCar = carList.firstOrNull { it.id == selectedCarId } ?: carList.firstOrNull() ?:
+    Car(name = "Henüz araç eklenmedi"
+        , km = "0"
+        , maintenanceList = mutableListOf(
+            Maintenance("Yapılan bakım","Bakım ayrıntıları burada gözükür")
+        ))
+
 
     Scaffold(bottomBar = { SimpleBottomBar(navController) },
         floatingActionButton = {
@@ -118,25 +124,16 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (carList.isEmpty()) {
-                Text(
-                    text = "Henüz araç eklenmemiş.",
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                selectedCar?.let { car ->
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        CarCardLazy(navController = navController, list = carList) { selected ->
-                            selectedCarId = selected.id
-                        }
-                        CarSelectedDashboard(car, onAddMaintenanceClick = {
-                            navController.navigate("addMaintenance/${car.id}")
-                        })
-                        DashboardQuickStatsSection()
-                        InfoStatLazy(car.maintenanceList, modifier = Modifier.weight(1f))
+            selectedCar?.let { car ->
+                Column(modifier = Modifier.fillMaxSize()) {
+                    CarCardLazy(navController = navController, list = carList) { selected ->
+                        selectedCarId = selected.id
                     }
+                    CarSelectedDashboard(car, onAddMaintenanceClick = {
+                        navController.navigate("addMaintenance/${car.id}")
+                    })
+                    DashboardQuickStatsSection()
+                    InfoStatLazy(car.maintenanceList, modifier = Modifier.weight(1f))
                 }
             }
         }
