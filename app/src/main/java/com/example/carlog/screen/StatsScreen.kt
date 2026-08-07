@@ -31,6 +31,8 @@ import java.util.Locale
 fun StatsScreen(
     viewModel: CarDataViewModel = viewModel()
 ) {
+
+
     val carList by viewModel.cars.collectAsState()
     
     // Basit istatistik hesaplamaları

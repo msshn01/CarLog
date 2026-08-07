@@ -1,6 +1,5 @@
 package com.example.carlog.screen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -71,7 +70,6 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
 
             // uiState her değiştiğinde bu blok otomatik olarak tekrar çalışır
             LaunchedEffect(uiState) {
-                Log.e("StateTest", "Ekrandaki güncel state: $uiState")
                 if (uiState is RegisterUiState.Success){
                     navController.navigate("home"){
                         popUpTo("registerScreen") { inclusive = true }

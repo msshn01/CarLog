@@ -1,6 +1,5 @@
 package com.example.carlog.screen
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,7 +48,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.carlog.R
@@ -73,12 +71,8 @@ fun LoginScreen(
             , verticalArrangement = Arrangement.Center
 
         ) {
-            val uiState by viewModel.uiState.collectAsState()
             val scope = rememberCoroutineScope()
-            // uiState her değiştiğinde bu blok otomatik olarak tekrar çalışır
-            LaunchedEffect(uiState) {
-                Log.e("StateTest", "Ekrandaki güncel state: $uiState")
-            }
+            
             var email by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
 

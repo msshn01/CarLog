@@ -1,6 +1,5 @@
 package com.example.carlog.screen
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -97,7 +96,8 @@ import java.util.*
 fun MainScreen(
     viewModel: UserViewModel = viewModel(),
     viewModel2: CarDataViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
+    onNavigateToStats: () -> Unit = { navController.navigate("statistika") }
 ) {
     var selectedCarId by remember { mutableStateOf("") }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -105,7 +105,6 @@ fun MainScreen(
 
     val carList by viewModel2.cars.collectAsState()
      // Varsayılan araç
-    val isLoading by viewModel2.isLoading.collectAsState()
     val selectedCar = carList.firstOrNull { it.id == selectedCarId } ?: carList.firstOrNull() ?:
     Car(name = "Henüz araç eklenmedi"
         , km = "0"
@@ -146,7 +145,7 @@ fun MainScreen(
         )
     }
 
-    Scaffold(bottomBar = { SimpleBottomBar(navController) },
+    Scaffold(bottomBar = { SimpleBottomBar(navController, onNavigateToStats) },
         floatingActionButton = {
             AddLogFloatingActionButton {
                 navController.navigate("addCar")
@@ -635,7 +634,6 @@ fun CarLogTopBar(
     var isMenuExpanded by remember { mutableStateOf(false) }
 
     // Özel Renk Tanımlamaları
-    val darkMenuBg = Color(0xFF1E1E1E)      // Koyu gri menü arka planı
     val iconColor = Color(0xFFB0B0B0)       // İkon rengi
     val logoutRed = Color(0xFFFF5252)       // Çıkış butonu için kırmızı
 
@@ -747,7 +745,7 @@ fun CarLogTopBar(
 
 
 @Composable
-fun SimpleBottomBar(navController: NavController) {
+fun SimpleBottomBar(navController: NavController,onNavigateToStats: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -762,9 +760,7 @@ fun SimpleBottomBar(navController: NavController) {
             icon = Icons.Default.TableChart,
             label =  "Kayıtlar",
             onClick = {
-                navController.navigate("logs") {
-
-                }
+                navController.navigate("logs")
             }
         )
 
@@ -773,9 +769,7 @@ fun SimpleBottomBar(navController: NavController) {
             icon = Icons.Default.InsertChart,
             label = "İstatistikler",
             onClick = {
-                navController.navigate("statistika") {
-
-                }
+                onNavigateToStats()
             }
         )
 
@@ -784,9 +778,7 @@ fun SimpleBottomBar(navController: NavController) {
             icon = Icons.Default.Person,
             label = "Profil",
             onClick = {
-                navController.navigate("profil") {
-
-                }
+                navController.navigate("profil")
             }
         )
     }
