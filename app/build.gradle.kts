@@ -1,6 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+}
+
+// local.properties dosyasını okumak için
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -15,6 +24,16 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // local.properties'den ID'leri alıyoruz
+        val admobAppId = localProperties.getProperty("ADMOB_APP_ID") ?: ""
+        val admobUnitId = localProperties.getProperty("ADMOB_INTERSTITIAL_UNIT_ID") ?: ""
+
+        // Manifest için placeholder
+        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
+        
+        // Kotlin kodu için BuildConfig alanı
+        buildConfigField("String", "ADMOB_INTERSTITIAL_UNIT_ID", "\"$admobUnitId\"")
     }
 
     buildTypes {
@@ -33,6 +52,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 val nav_version = "2.9.8"

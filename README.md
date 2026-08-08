@@ -4,6 +4,9 @@ Uygulama; araç takibi, bakım/gider yönetimi, randevu sistemi, sigorta teklifl
 
 ---
 
+
+Bu projede MVVM mimarisi kullanılarak Seperation of Concerns (Sorumlulukların Ayrılması) prensibi uygulanmıştır. Veri katmanı Repository Pattern ile soyutlanmış, UI tarafında Jetpack Compose ile reaktif bir yapı kurulmuştur.
+
 ## 🏗️ Faz 1: Temel Mimari, Yetkilendirme & Offline-First Yapı
 
 ### 1.1. Proje Altyapısı & Mimari

@@ -36,6 +36,17 @@ fun ProfileScreen(
     val userProfile by viewModel.userProfile.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+    var showAboutDialog by remember { mutableStateOf(false) }
+    var showSupportDialog by remember { mutableStateOf(false) }
+
+    if (showAboutDialog) {
+        AboutAppDialog(onDismiss = { showAboutDialog = false })
+    }
+
+    if (showSupportDialog) {
+        SupportDialog(onDismiss = { showSupportDialog = false })
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -166,8 +177,16 @@ fun ProfileScreen(
                                 helper.sendNotification("CarLog Test", "Bildirim sistemi aktif ve çalışıyor!")
                             }
                         )
-                        ProfileMenuItem(icon = Icons.AutoMirrored.Filled.HelpOutline, label = "Destek Al")
-                        ProfileMenuItem(icon = Icons.Default.Info, label = "Uygulama Hakkında")
+                        ProfileMenuItem(
+                            icon = Icons.AutoMirrored.Filled.HelpOutline, 
+                            label = "Destek Al",
+                            onClick = { showSupportDialog = true }
+                        )
+                        ProfileMenuItem(
+                            icon = Icons.Default.Info, 
+                            label = "Uygulama Hakkında",
+                            onClick = { showAboutDialog = true }
+                        )
                     }
                     
                     Spacer(modifier = Modifier.height(40.dp))
@@ -338,6 +357,152 @@ fun NotificationToggleItem(
                 )
             )
         }
+    }
+}
+
+
+@Composable
+fun SupportDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.HelpOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Destek ve İletişim",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+        text = {
+            Column {
+                Text(
+                    text = "Herhangi bir sorun yaşarsanız veya geri bildirimde bulunmak isterseniz bize e-posta yoluyla ulaşabilirsiniz:",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Surface(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "sahanmusa29@gmail.com",
+                        modifier = Modifier.padding(16.dp),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Kapat", fontWeight = FontWeight.Bold)
+            }
+        }
+    )
+}
+
+@Composable
+fun AboutAppDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(28.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Uygulama Hakkında",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 400.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                AboutSection(
+                    title = "CarLog Nedir?",
+                    description = "CarLog, araç sahiplerinin hayatını kolaylaştırmak için tasarlanmış dijital bir araç günlüğüdür. Aracınızın bakım geçmişini, sigorta ve muayene tarihlerini tek bir noktadan takip etmenizi sağlar."
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                AboutSection(
+                    title = "Neden Kullanmalısınız?",
+                    description = "• Zamanında Hatırlatmalar: Muayene ve sigorta tarihlerini unutmanızı engeller.\n• Bakım Geçmişi: Aracınıza yapılan tüm işlemleri tutar, satarken değerini korur.\n• İstatistikler: Harcamalarınızı analiz etmenizi sağlar."
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AboutSection(
+                    title = "Geliştirici",
+                    description = "Bu uygulama, modern Android teknolojileri (Jetpack Compose, Firebase, Material 3) kullanılarak profesyonel bir portfolyo projesi olarak geliştirilmiştir."
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AboutSection(
+                    title = "Versiyon",
+                    description = "1.0.0 (Stabil)\n© 2024 CarLog Team"
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    "Kapat",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun AboutSection(title: String, description: String) {
+    Column {
+        Text(
+            text = title,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = description,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            lineHeight = 20.sp
+        )
     }
 }
 

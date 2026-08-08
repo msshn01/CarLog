@@ -15,7 +15,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.carlog.AdManager // AdManager sınıfının import edildiğinden emin ol
+import com.example.carlog.AdManager
+import com.example.carlog.BuildConfig
 import com.example.carlog.screen.AddCarScreen
 import com.example.carlog.screen.LoginScreen
 import com.example.carlog.screen.RegisterScreen
@@ -39,13 +40,12 @@ fun NavBar(){
     val activity = context as? Activity
     val adManager = remember { AdManager(context) }
 
-    // Google Test Interstitial Ad Unit ID
-    val TEST_AD_UNIT = "ca-app-pub-3940256099942544/1033173712"
-    //ca-app-pub-9023363539921560/8161955804
+    // Google Interstitial Ad Unit ID (local.properties'den gelir)
+    val AD_UNIT_ID = BuildConfig.ADMOB_INTERSTITIAL_UNIT_ID
 
     // NavBar ilklendiğinde reklamı arka planda indirmeye başlatıyoruz
     LaunchedEffect(Unit) {
-        adManager.loadInterstitialAd(TEST_AD_UNIT)
+        adManager.loadInterstitialAd(AD_UNIT_ID)
     }
 
     NavHost(navController = navController, startDestination = "openScreen"){
@@ -61,7 +61,7 @@ fun NavBar(){
                             navController.navigate("statistika")
 
                             // Bir sonraki geçiş için reklamı tekrar yükle
-                            adManager.loadInterstitialAd(TEST_AD_UNIT)
+                            adManager.loadInterstitialAd(AD_UNIT_ID)
                         }
                     } else {
                         navController.navigate("statistika")
